@@ -4,25 +4,16 @@ $zl_set = [];  //Piped into zl::$set after init
 $zl_page = []; //Piped into zl::$page after init
 $zl_site = []; //Piped into zl::$site after init
 
-//Automatically set the dev or prod mode based on server's linux hostname
-//Feel free to replace this with your own logic.
-//
-//define("zl_mode", "dev"); //uncomment this line to force display of debugger
-
+//Auto-detect mode (environment). Feel free to replace this.
 if(!defined('zl_mode'))
 {
-	$serverHostname = strtolower(gethostname());
-	if($serverHostname != "")
-	{
-		if(substr($serverHostname,-3,3) == "dev")      { define("zl_mode", "dev"); }
-		elseif(substr($serverHostname,-5,5)== "stage") { define("zl_mode", "stage"); }
-		else                                           { define("zl_mode", "prod"); }
-	}
-	else //local development environment?
-	{
-		if( (substr($_SERVER['SERVER_ADDR'], 0,4) == "172." || substr($_SERVER['SERVER_ADDR'], 0,7) == "10.0.2.") && $_SERVER['REQUEST_SCHEME'] == "http" && isset($_SERVER['HTTP_X_FORWARDED_HOST'])) { define("zl_mode", "dev"); }
-		else { define("zl_mode", "prod"); }
-	}
+	$host = trim($_SERVER['HTTP_HOST']);
+	if(stripos($host, 'localhost') !== false)      define("zl_mode", "dev");
+	elseif(stripos($host, '127.0.0.1') !== false)  define("zl_mode", "dev");
+	elseif(stripos($host, 'dev') === 0)            define("zl_mode", "dev");
+	elseif(stripos($host, 'mydev') === 0)          define("zl_mode", "dev");
+	elseif(stripos($host, 'stage') === 0)          define("zl_mode", "stage");
+	else                                           define("zl_mode", "prod"); //Default
 }
 
 //--------------------- ZL behavior and features ---------------------
